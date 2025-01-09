@@ -95,4 +95,65 @@ class Automation {
       debugPrint("StackTrace: $stackTrace");
     }
   }
+
+  Future<void> addMapView({required String directory}) async {
+    final mapViewFile = File('$directory/lib/screens/map_view.dart');
+    try {
+      await mapViewFile.create(recursive: true);
+      debugPrint(
+          'File map_view created successfully in ${mapViewFile.absolute.path}.');
+    } catch (e) {
+      debugPrint('Error creating file: $e');
+    }
+    const String mapViewCode = '''
+import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+class MapSample extends StatelessWidget {
+  static const CameraPosition _kGooglePlex = CameraPosition(
+    target: LatLng(37.42796133580664, -122.085749655962),
+    zoom: 14.4746,
+  );
+
+  const MapSample({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const GoogleMap(
+      mapType: MapType.hybrid,
+      initialCameraPosition: _kGooglePlex,
+    );
+  }
+}
+''';
+    if (!mapViewFile.existsSync()) {
+      throw Exception("AppDelegate.swift not found.");
+    }
+
+    try {
+      await mapViewFile.writeAsString(mapViewCode);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  Future<void> updateHomeScreen({required String directory}) async {
+    try {
+      final homeScreenFile = File('$directory/lib/screens/home_screen.dart');
+      if (!homeScreenFile.existsSync()) {
+        throw Exception('home screen not found!');
+      }
+
+      final homeScreenASlines = await homeScreenFile.readAsLines();
+
+      final indexToAddMapView = homeScreenASlines
+          .indexWhere((line) => line.contains('// add view here'));
+      homeScreenASlines.insert(0, '''import 'map_view.dart';''');
+      homeScreenASlines.insert(indexToAddMapView, 'child: MapSample(),');
+
+      homeScreenFile.writeAsString(homeScreenASlines.join('\n'));
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
 }
