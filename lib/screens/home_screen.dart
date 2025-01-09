@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:heyflutter/providers/directory_provider.dart';
-import 'package:heyflutter/providers/prograse_provider.dart';
 
 import '../constants/constants.dart';
+import '../services/automation.dart';
 
 class HomeScreen extends ConsumerWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+  final automation = Automation();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final directory = ref.watch(directoryProvider);
     final directoryNotifier = ref.read(directoryProvider.notifier);
 
-    final prograse = ref.watch(prograseProvider);
-    final prograseNofier = ref.read(prograseProvider.notifier);
     return Scaffold(
       appBar: AppBar(
         title: const Text('HeyFlutter'),
@@ -43,18 +42,58 @@ class HomeScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     style: bottomStyle,
-                    onPressed: () {
-                      prograseNofier.addPackageToPubspec(directory: directory);
+                    onPressed: () async {
+                      await automation.addPackagePubspec(
+                          projectPath: directory,
+                          packageName: 'google_maps_flutter',
+                          packageVersion: '2.10.0');
+                      await promptForApiKey(context, ref);
                     },
                     child: const Text('Add Google map to project'),
                   ),
                   const SizedBox(height: 16),
-                  Text(prograse),
                 ],
               )
           ],
         ),
       ),
+    );
+  }
+
+  Future<String?> promptForApiKey(BuildContext context, WidgetRef ref) async {
+    final directory = ref.watch(directoryProvider);
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Enter Google Maps API Key'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(hintText: 'API Key'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                debugPrint('don\'t ptovided an api key!');
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await automation.updateAnodroidManifist(
+                    projectPath: directory, apiKey: controller.text);
+                await automation.updateAppDelegate(
+                    projectPath: directory, apiKey: controller.text);
+                debugPrint('an api key added');
+                Navigator.pop(context, controller.text);
+              },
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
