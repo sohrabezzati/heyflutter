@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:heyflutter/screens/mobile_home_screen.dart';
 
 import 'screens/home_screen.dart';
 
@@ -10,7 +13,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Hey Flutter",
-      home: HomeScreen(),
+      home: Platform.isAndroid || Platform.isIOS
+          ? const MobileHomeScreen()
+          : HomeScreen(),
     );
   }
 }

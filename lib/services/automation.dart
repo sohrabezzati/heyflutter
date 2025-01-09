@@ -139,7 +139,8 @@ class MapSample extends StatelessWidget {
 
   Future<void> updateHomeScreen({required String directory}) async {
     try {
-      final homeScreenFile = File('$directory/lib/screens/home_screen.dart');
+      final homeScreenFile =
+          File('$directory/lib/screens/mobile_home_screen.dart');
       if (!homeScreenFile.existsSync()) {
         throw Exception('home screen not found!');
       }
@@ -147,7 +148,7 @@ class MapSample extends StatelessWidget {
       final homeScreenASlines = await homeScreenFile.readAsLines();
 
       final indexToAddMapView = homeScreenASlines
-          .indexWhere((line) => line.contains('// add view here'));
+          .indexWhere((line) => line.contains('// add map view here'));
       homeScreenASlines.insert(0, '''import 'map_view.dart';''');
       homeScreenASlines.insert(indexToAddMapView, 'child: MapSample(),');
 

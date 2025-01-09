@@ -1,4 +1,3 @@
-import 'map_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:heyflutter/providers/directory_provider.dart';
@@ -70,13 +69,6 @@ class HomeScreen extends ConsumerWidget {
                 },
                 child: const Text('Add Map View and Build Android'),
               ),
-            state == 'map view added'
-                ? const SizedBox(
-                    height: 300,
-                    child: MapSample(),
-                    // add view here
-                  )
-                : const SizedBox()
           ],
         ),
       ),
