@@ -24,16 +24,17 @@ class Automation {
       pubspecLines.insert(
           insertPackageIndex, '  $packageName: ^$packageVersion');
       await pubspecFile.writeAsString(pubspecLines.join('\n'));
-      await runPubget(directory: projectPath);
+      await runCommand(directory: projectPath, command: '''flutter pub get''');
     } catch (e, stackTrace) {
       debugPrint("Error : $e\nStackTrace : $stackTrace");
     }
   }
 
-  Future<void> runPubget({required String directory}) async {
+  Future<void> runCommand(
+      {required String directory, required String command}) async {
     final shell = Shell(workingDirectory: directory);
     try {
-      await shell.run('''flutter pub get''');
+      await shell.run(command);
     } catch (e) {
       debugPrint(e.toString());
     }
